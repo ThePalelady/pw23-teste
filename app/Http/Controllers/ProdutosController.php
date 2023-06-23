@@ -17,9 +17,11 @@ class ProdutosController extends Controller
 
             $prods = Produto::where('name', 'LIKE', "%{$busca}%")
                 ->orderBy('name', $ord)
-                ->get();
+                ->paginate();
+                // ->get();
         } else {
-            $prods = Produto::all();
+            // $prods = Produto::all();
+            $prods = Produto::paginate();
         }
 
         # Busca tudo com apagados
