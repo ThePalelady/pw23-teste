@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UsuariosController extends Controller
 {
@@ -21,10 +23,38 @@ class UsuariosController extends Controller
                 'email' => 'email|required',
                 'password' => 'string|required',
             ]);
+
+            $usr['password'] = Hash::make($usr['password']);
+
             Usuario::create($usr);
             return redirect()->route('usuarios');
         }
 
         return view('usuarios.add');
+    }
+
+    public function login(Request $request) {
+        // Se for POST, tenta logar
+        if ($request->isMethod('POST')) {
+            $data = $request->validate([
+                'email' => 'required',
+                'password' => 'required',
+            ]);
+
+            if (Auth::attempt($data)) {
+                return redirect()->route('home');
+            } else {
+                return redirect()->route('login')->with('erro', 'Deu ruim!');
+            }
+        }
+
+        // Não era POST...
+        return view('usuarios.login');
+    }
+
+    public function logout() {
+        Auth::logout();
+
+        return redirect()->route('home');
     }
 }
